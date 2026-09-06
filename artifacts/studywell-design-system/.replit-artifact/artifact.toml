@@ -1,0 +1,19 @@
+kind = "design-system"
+previewPath = "/studywell-design-system/"
+title = "Studywell Design System"
+description = "A reusable visual language for Studywell's calm academic workspace, combining warm parchment surfaces, deep teal structure, marigold focus accents, and editorial typography for student productivity products."
+version = "1.0.0"
+id = "artifacts/studywell-design-system"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/studywell-design-system/" ]
+localPort = 19455
+
+[services.development]
+run = "pnpm --filter @workspace/studywell-design-system run dev"
+
+[services.env]
+PORT = "19455"
+BASE_PATH = "/studywell-design-system/"
