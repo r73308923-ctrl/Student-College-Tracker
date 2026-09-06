@@ -1,0 +1,1 @@
+- [Student tracker backend](student-tracker-backend.md) — local scrypt auth, hashed sessions, SQLite ownership checks, and date normalization are deliberate product constraints.

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Student College Tracker"
+description = "A secure personal college companion for students to manage attendance, subjects, tasks, exams, study time, productivity, and daily academic priorities with isolated data per account."
+version = "1.0.0"
+id = "artifacts/student-college-tracker"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23727
+
+[services.development]
+run = "pnpm --filter @workspace/student-college-tracker run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/student-college-tracker", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/student-college-tracker/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23727"
+BASE_PATH = "/"

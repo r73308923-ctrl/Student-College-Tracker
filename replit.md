@@ -1,44 +1,55 @@
-# [Project name]
+# Student College Tracker
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Studywell is a secure personal college companion for managing subjects, attendance, tasks, exams, study sessions, analytics, and daily academic priorities.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the API server
+- `pnpm --filter @workspace/student-college-tracker run dev` — run the web app
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- SQLite is created automatically at `data/student-tracker.sqlite` (override with `SQLITE_PATH`).
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
 - API: Express 5
-- DB: PostgreSQL + Drizzle ORM
+- DB: SQLite + better-sqlite3
 - Validation: Zod (`zod/v4`), `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/student-college-tracker/src/App.tsx` — authenticated web experience, routing, forms, and dashboard screens.
+- `artifacts/student-college-tracker/src/index.css` — Studywell visual tokens and responsive styles.
+- `artifacts/api-server/src/routes/student.ts` — auth, user-scoped CRUD, analytics, and recommendation endpoints.
+- `artifacts/api-server/src/lib/sqlite.ts` — SQLite schema and connection setup.
+- `lib/api-spec/openapi.yaml` — source of truth for the generated API hooks and validation schemas.
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Local authentication is intentional: signup/login use scrypt-hashed passwords and opaque, hashed session tokens stored in SQLite.
+- Every student-owned query includes `student_id`; ownership is enforced in the API rather than trusted from the client.
+- Dates are stored as ISO date-only strings so attendance, due dates, exams, and study history stay timezone-stable.
+- The frontend uses generated React Query hooks and invalidates affected views after every successful mutation.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Students can create an account, sign in, sign out, and maintain a personal profile.
+- Dashboard surfaces attendance percentage and 75% recovery math, open tasks, upcoming exams, study momentum, productivity score, streak, recent activity, and a next-action recommendation.
+- Subjects support attendance records; tasks and exams support create/edit/delete flows; study sessions and analytics make progress visible.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- The requested product name is Student College Tracker; the in-app identity is Studywell.
+- The user explicitly requested SQLite and hashed passwords.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- After changing `lib/api-spec/openapi.yaml`, run `pnpm --filter @workspace/api-spec run codegen`.
+- The API creates the SQLite file and tables on startup; no Postgres migration is required for this product.
 
 ## Pointers
 

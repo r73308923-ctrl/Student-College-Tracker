@@ -10,6 +10,20 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Account access
+  - name: dashboard
+    description: Student overview and insights
+  - name: profile
+    description: Student profile
+  - name: subjects
+    description: Subjects and attendance
+  - name: tasks
+    description: Study task management
+  - name: exams
+    description: Exam planning
+  - name: study
+    description: Study sessions
 paths:
   /healthz:
     get:
@@ -24,7 +38,372 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /auth/signup:
+    post:
+      operationId: signup
+      tags: [auth]
+      summary: Create a student account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupInput"
+      responses:
+        "201":
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "409":
+          description: Email already registered
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Sign in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Signed in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Sign out
+      responses:
+        "204":
+          description: Signed out
+  /auth/me:
+    get:
+      operationId: getCurrentStudent
+      tags: [auth]
+      summary: Get the current student
+      responses:
+        "200":
+          description: Current student
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "401":
+          description: Not signed in
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get dashboard summary
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+  /dashboard/recommendation:
+    get:
+      operationId: getRecommendation
+      tags: [dashboard]
+      summary: Get the next best study action
+      responses:
+        "200":
+          description: Recommendation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recommendation"
+  /profile:
+    patch:
+      operationId: updateProfile
+      tags: [profile]
+      summary: Update personal student profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+  /subjects:
+    get:
+      operationId: getSubjects
+      tags: [subjects]
+      summary: List subjects
+      responses:
+        "200":
+          description: Subjects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Subject"
+    post:
+      operationId: createSubject
+      tags: [subjects]
+      summary: Create a subject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubjectInput"
+      responses:
+        "201":
+          description: Created subject
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subject"
+  /subjects/{id}:
+    patch:
+      operationId: updateSubject
+      tags: [subjects]
+      summary: Update a subject
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubjectUpdate"
+      responses:
+        "200":
+          description: Updated subject
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subject"
+    delete:
+      operationId: deleteSubject
+      tags: [subjects]
+      summary: Delete a subject
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Deleted
+  /attendance:
+    get:
+      operationId: getAttendance
+      tags: [subjects]
+      summary: List attendance records
+      responses:
+        "200":
+          description: Attendance records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Attendance"
+    post:
+      operationId: createAttendance
+      tags: [subjects]
+      summary: Record attendance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttendanceInput"
+      responses:
+        "201":
+          description: Created attendance record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Attendance"
+  /tasks:
+    get:
+      operationId: getTasks
+      tags: [tasks]
+      summary: List tasks
+      responses:
+        "200":
+          description: Tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+    post:
+      operationId: createTask
+      tags: [tasks]
+      summary: Create a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskInput"
+      responses:
+        "201":
+          description: Created task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+  /tasks/{id}:
+    patch:
+      operationId: updateTask
+      tags: [tasks]
+      summary: Update a task
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskUpdate"
+      responses:
+        "200":
+          description: Updated task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+    delete:
+      operationId: deleteTask
+      tags: [tasks]
+      summary: Delete a task
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Deleted
+  /exams:
+    get:
+      operationId: getExams
+      tags: [exams]
+      summary: List upcoming exams
+      responses:
+        "200":
+          description: Exams
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Exam"
+    post:
+      operationId: createExam
+      tags: [exams]
+      summary: Create an exam
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExamInput"
+      responses:
+        "201":
+          description: Created exam
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exam"
+  /exams/{id}:
+    patch:
+      operationId: updateExam
+      tags: [exams]
+      summary: Update an exam
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExamUpdate"
+      responses:
+        "200":
+          description: Updated exam
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exam"
+    delete:
+      operationId: deleteExam
+      tags: [exams]
+      summary: Delete an exam
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Deleted
+  /study-sessions:
+    get:
+      operationId: getStudySessions
+      tags: [study]
+      summary: List study sessions
+      responses:
+        "200":
+          description: Study sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StudySession"
+    post:
+      operationId: createStudySession
+      tags: [study]
+      summary: Log a study session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudySessionInput"
+      responses:
+        "201":
+          description: Created study session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudySession"
+  /analytics:
+    get:
+      operationId: getAnalytics
+      tags: [dashboard]
+      summary: Get academic analytics
+      responses:
+        "200":
+          description: Analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Analytics"
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +412,259 @@ components:
           type: string
       required:
         - status
+    SignupInput:
+      type: object
+      required: [name, email, password]
+      properties:
+        name: { type: string, minLength: 2 }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+        college: { type: string }
+        course: { type: string }
+        year: { type: integer, minimum: 1, maximum: 8 }
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 1 }
+    AuthResponse:
+      type: object
+      required: [student]
+      properties:
+        student: { $ref: "#/components/schemas/Student" }
+    Student:
+      type: object
+      required: [id, name, email]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        college: { type: ["string", "null"] }
+        course: { type: ["string", "null"] }
+        year: { type: ["integer", "null"] }
+        avatarColor: { type: string }
+    ProfileUpdate:
+      type: object
+      properties:
+        name: { type: string, minLength: 2 }
+        college: { type: string }
+        course: { type: string }
+        year: { type: integer, minimum: 1, maximum: 8 }
+    Subject:
+      type: object
+      required: [id, name, code, color, attended, total, percentage]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        code: { type: string }
+        color: { type: string }
+        attended: { type: integer }
+        total: { type: integer }
+        percentage: { type: number }
+    SubjectInput:
+      type: object
+      required: [name, code, color]
+      properties:
+        name: { type: string, minLength: 1 }
+        code: { type: string, minLength: 1 }
+        color: { type: string }
+        attended: { type: integer, minimum: 0 }
+        total: { type: integer, minimum: 0 }
+    SubjectUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        code: { type: string }
+        color: { type: string }
+        attended: { type: integer, minimum: 0 }
+        total: { type: integer, minimum: 0 }
+    Attendance:
+      type: object
+      required: [id, subjectId, date, present]
+      properties:
+        id: { type: integer }
+        subjectId: { type: integer }
+        subjectName: { type: string }
+        date: { type: string, format: date }
+        present: { type: boolean }
+    AttendanceInput:
+      type: object
+      required: [subjectId, date, present]
+      properties:
+        subjectId: { type: integer }
+        date: { type: string, format: date }
+        present: { type: boolean }
+    Task:
+      type: object
+      required: [id, title, status, priority, dueDate]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: ["string", "null"] }
+        status: { type: string, enum: [todo, in_progress, done] }
+        priority: { type: string, enum: [low, medium, high] }
+        dueDate: { type: ["string", "null"], format: date }
+        subjectId: { type: ["integer", "null"] }
+        subjectName: { type: ["string", "null"] }
+    TaskInput:
+      type: object
+      required: [title, priority]
+      properties:
+        title: { type: string, minLength: 1 }
+        description: { type: string }
+        status: { type: string, enum: [todo, in_progress, done] }
+        priority: { type: string, enum: [low, medium, high] }
+        dueDate: { type: string, format: date }
+        subjectId: { type: integer }
+    TaskUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        description: { type: string }
+        status: { type: string, enum: [todo, in_progress, done] }
+        priority: { type: string, enum: [low, medium, high] }
+        dueDate: { type: string, format: date }
+        subjectId: { type: integer }
+    Exam:
+      type: object
+      required: [id, title, date, status]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        date: { type: string, format: date }
+        time: { type: ["string", "null"] }
+        room: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        subjectId: { type: ["integer", "null"] }
+        subjectName: { type: ["string", "null"] }
+        status: { type: string, enum: [upcoming, completed] }
+    ExamInput:
+      type: object
+      required: [title, date]
+      properties:
+        title: { type: string, minLength: 1 }
+        date: { type: string, format: date }
+        time: { type: string }
+        room: { type: string }
+        notes: { type: string }
+        subjectId: { type: integer }
+    ExamUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        date: { type: string, format: date }
+        time: { type: string }
+        room: { type: string }
+        notes: { type: string }
+        subjectId: { type: integer }
+    StudySession:
+      type: object
+      required: [id, date, minutes, focus]
+      properties:
+        id: { type: integer }
+        date: { type: string, format: date }
+        minutes: { type: integer }
+        focus: { type: string }
+        subjectId: { type: ["integer", "null"] }
+        subjectName: { type: ["string", "null"] }
+    StudySessionInput:
+      type: object
+      required: [date, minutes, focus]
+      properties:
+        date: { type: string, format: date }
+        minutes: { type: integer, minimum: 1 }
+        focus: { type: string, minLength: 1 }
+        subjectId: { type: integer }
+    Dashboard:
+      type: object
+      required: [student, attendance, tasks, exams, study, productivity, streak, recentActivity]
+      properties:
+        student: { $ref: "#/components/schemas/Student" }
+        attendance:
+          type: object
+          required: [percentage, attended, total, classesNeeded]
+          properties:
+            percentage: { type: number }
+            attended: { type: integer }
+            total: { type: integer }
+            classesNeeded: { type: integer }
+        tasks:
+          type: object
+          required: [open, completed, dueToday]
+          properties:
+            open: { type: integer }
+            completed: { type: integer }
+            dueToday: { type: integer }
+        exams:
+          type: object
+          required: [upcoming, next]
+          properties:
+            upcoming: { type: integer }
+            next:
+              anyOf:
+                - $ref: "#/components/schemas/Exam"
+                - type: "null"
+        study:
+          type: object
+          required: [minutesThisWeek, sessionsThisWeek]
+          properties:
+            minutesThisWeek: { type: integer }
+            sessionsThisWeek: { type: integer }
+        productivity: { type: integer }
+        streak: { type: integer }
+        recentActivity:
+          type: array
+          items: { $ref: "#/components/schemas/Activity" }
+    Activity:
+      type: object
+      required: [label, detail, tone]
+      properties:
+        label: { type: string }
+        detail: { type: string }
+        tone: { type: string, enum: [blue, green, amber, violet] }
+    Recommendation:
+      type: object
+      required: [title, reason, action, tone]
+      properties:
+        title: { type: string }
+        reason: { type: string }
+        action: { type: string }
+        tone: { type: string, enum: [attendance, exam, task, study] }
+    Analytics:
+      type: object
+      required: [weeklyStudy, taskCompletion, attendanceBySubject, productivityByWeek]
+      properties:
+        weeklyStudy:
+          type: array
+          items:
+            type: object
+            required: [label, minutes]
+            properties:
+              label: { type: string }
+              minutes: { type: integer }
+        taskCompletion:
+          type: array
+          items:
+            type: object
+            required: [label, value]
+            properties:
+              label: { type: string }
+              value: { type: integer }
+        attendanceBySubject:
+          type: array
+          items:
+            type: object
+            required: [label, percentage]
+            properties:
+              label: { type: string }
+              percentage: { type: number }
+        productivityByWeek:
+          type: array
+          items:
+            type: object
+            required: [label, score]
+            properties:
+              label: { type: string }
+              score: { type: integer }
 
