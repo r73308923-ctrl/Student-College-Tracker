@@ -97,9 +97,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Student"
-        "401":
-          description: Not signed in
+                anyOf:
+                  - $ref: "#/components/schemas/Student"
+                  - type: "null"
   /dashboard:
     get:
       operationId: getDashboard

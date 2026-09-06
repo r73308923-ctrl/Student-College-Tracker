@@ -224,10 +224,10 @@ function Router() {
   const auth = location === '/login' || location === '/signup';
   const session = useGetCurrentStudent({ query: { enabled: !auth, retry: false, queryKey: getGetCurrentStudentQueryKey() } });
   useEffect(() => {
-    if (!auth && session.isError) setLocation('/login');
-  }, [auth, session.isError, setLocation]);
+    if (!auth && !session.isLoading && (session.isError || !session.data)) setLocation('/login');
+  }, [auth, session.data, session.isError, session.isLoading, setLocation]);
   if (!auth && session.isLoading) return <LoadingPage />;
-  if (!auth && session.isError) return null;
+  if (!auth && (session.isError || !session.data)) return null;
   return <ErrorBoundary resetKey={location}>{auth ? <Switch><Route path="/login" component={LoginPage} /><Route path="/signup" component={SignupPage} /><Route component={NotFound} /></Switch> : <ProtectedRoutes />}</ErrorBoundary>;
 }
 function App() {

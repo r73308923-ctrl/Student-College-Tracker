@@ -161,9 +161,8 @@ router.post("/auth/logout", (req, res) => {
 });
 
 router.get("/auth/me", (req: RequestWithStudent, res) => {
-  const student = requireStudent(req, res);
-  if (!student) return;
-  res.json(publicStudent(student));
+  const student = currentStudent(req);
+  res.json(student ? publicStudent(student) : null);
 });
 
 router.patch("/profile", (req: RequestWithStudent, res) => {

@@ -83,7 +83,7 @@ export const LogoutResponse = zod.void()
 /**
  * @summary Get the current student
  */
-export const GetCurrentStudentResponse = zod.object({
+export const GetCurrentStudentResponse = zod.union([zod.object({
   "id": zod.number().int(),
   "name": zod.string(),
   "email": zod.string(),
@@ -91,7 +91,7 @@ export const GetCurrentStudentResponse = zod.object({
   "course": zod.string().nullish(),
   "year": zod.number().int().nullish(),
   "avatarColor": zod.string().optional()
-})
+}),zod.null()])
 
 
 /**

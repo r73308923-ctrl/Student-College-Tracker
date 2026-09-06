@@ -373,9 +373,9 @@ export const getGetCurrentStudentUrl = () => {
 /**
  * @summary Get the current student
  */
-export const getCurrentStudent = async ( options?: Parameters<typeof customFetch>[1]): Promise<Student> => {
+export const getCurrentStudent = async ( options?: Parameters<typeof customFetch>[1]): Promise<Student | null> => {
 
-  return customFetch<Student>(getGetCurrentStudentUrl(),
+  return customFetch<Student | null>(getGetCurrentStudentUrl(),
   {
     ...options,
     method: 'GET'
@@ -395,7 +395,7 @@ export const getGetCurrentStudentQueryKey = () => {
     }
 
 
-export const getGetCurrentStudentQueryOptions = <TData = Awaited<ReturnType<typeof getCurrentStudent>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCurrentStudent>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetCurrentStudentQueryOptions = <TData = Awaited<ReturnType<typeof getCurrentStudent>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCurrentStudent>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -414,14 +414,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetCurrentStudentQueryResult = NonNullable<Awaited<ReturnType<typeof getCurrentStudent>>>
-export type GetCurrentStudentQueryError = ErrorType<void>
+export type GetCurrentStudentQueryError = ErrorType<unknown>
 
 
 /**
  * @summary Get the current student
  */
 
-export function useGetCurrentStudent<TData = Awaited<ReturnType<typeof getCurrentStudent>>, TError = ErrorType<void>>(
+export function useGetCurrentStudent<TData = Awaited<ReturnType<typeof getCurrentStudent>>, TError = ErrorType<unknown>>(
   options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCurrentStudent>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
