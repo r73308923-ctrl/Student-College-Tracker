@@ -23,6 +23,13 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import NotFound from '@/pages/not-found';
 import { Route, Switch, Link, useLocation, Router as WouterRouter } from 'wouter';
 import type { ReactNode, FormEvent } from 'react';
+import { Button as DesignSystemButton } from '@workspace/studywell-design-system/components/ui/button';
+import {
+  Field as DesignSystemField,
+  FieldDescription,
+  FieldLabel,
+} from '@workspace/studywell-design-system/components/ui/field';
+import { Skeleton as DesignSystemSkeleton } from '@workspace/studywell-design-system/components/ui/skeleton';
 import './index.css';
 
 const queryClient = new QueryClient();
@@ -55,7 +62,7 @@ function errorMessage(error: unknown) {
 }
 
 function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse rounded-xl bg-[hsl(var(--muted))] ${className}`} />;
+  return <DesignSystemSkeleton className={`rounded-xl ${className}`} />;
 }
 function LoadingPage() {
   return <div className="space-y-6"><Skeleton className="h-8 w-56" /><Skeleton className="h-28 w-full" /><div className="grid gap-4 md:grid-cols-3"><Skeleton className="h-36" /><Skeleton className="h-36" /><Skeleton className="h-36" /></div></div>;
@@ -73,11 +80,17 @@ function EmptyState({ icon: Icon, title, detail, action }: { icon: LucideIcon; t
   </div>;
 }
 function Button({ children, onClick, variant = 'primary', type = 'button', className = '', disabled = false, testId }: { children: ReactNode; onClick?: () => void; variant?: 'primary' | 'secondary' | 'ghost' | 'danger'; type?: 'button' | 'submit'; className?: string; disabled?: boolean; testId?: string }) {
-  const styles = { primary: 'bg-primary text-primary-foreground hover:opacity-90', secondary: 'bg-[hsl(var(--accent)/.18)] text-foreground hover:bg-[hsl(var(--accent)/.28)]', ghost: 'bg-transparent text-muted-foreground hover:bg-[hsl(var(--muted))] hover:text-foreground', danger: 'bg-[hsl(var(--destructive)/.1)] text-[hsl(var(--destructive))] hover:bg-[hsl(var(--destructive)/.18)]' };
-  return <button type={type} disabled={disabled} onClick={onClick} className={`inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${styles[variant]} ${className}`} data-testid={testId}>{children}</button>;
+  const styles = {
+    primary: 'hover:opacity-90',
+    secondary: 'border-transparent bg-[hsl(var(--accent)/.18)] text-foreground hover:bg-[hsl(var(--accent)/.28)]',
+    ghost: 'border-transparent bg-transparent text-muted-foreground hover:bg-[hsl(var(--muted))] hover:text-foreground',
+    danger: 'border-transparent bg-[hsl(var(--destructive)/.1)] text-[hsl(var(--destructive))] hover:bg-[hsl(var(--destructive)/.18)]',
+  };
+  const systemVariant = variant === 'danger' ? 'destructive' : variant === 'primary' ? 'default' : variant;
+  return <DesignSystemButton type={type} variant={systemVariant} disabled={disabled} onClick={onClick} className={`rounded-full px-4 py-2.5 text-sm font-semibold ${styles[variant]} ${className}`} data-testid={testId}>{children}</DesignSystemButton>;
 }
 function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
-  return <label className="block space-y-2"><span className="text-xs font-semibold uppercase tracking-[.12em] text-muted-foreground">{label}</span>{children}{hint && <span className="block text-xs text-muted-foreground">{hint}</span>}</label>;
+  return <DesignSystemField className="gap-2"><FieldLabel className="text-xs font-semibold uppercase tracking-[.12em] text-muted-foreground">{label}</FieldLabel>{children}{hint && <FieldDescription className="text-xs">{hint}</FieldDescription>}</DesignSystemField>;
 }
 function inputClass() { return 'w-full rounded-xl border bg-background/70 px-3.5 py-3 text-sm outline-none transition placeholder:text-muted-foreground/65 focus:border-[hsl(var(--accent))] focus:ring-2 focus:ring-[hsl(var(--accent)/.25)]'; }
 
