@@ -28,6 +28,7 @@ import {
 } from "@workspace/api-zod";
 import { sqlite, type StudentRow } from "../lib/sqlite";
 import { logger } from "../lib/logger";
+import { sendPasswordResetEmail } from "../lib/email";
 
 const router: IRouter = Router();
 const SESSION_COOKIE = "student_session";
@@ -170,7 +171,7 @@ router.post("/auth/login", (req, res) => {
   return;
 });
 
-router.post("/auth/password-reset/request", (req, res) => {
+router.post("/auth/password-reset/request", async (req, res) => {
   const parsed = RequestPasswordResetBody.safeParse(req.body);
   if (!parsed.success) return genericResetResponse(res);
   const email = parsed.data.email.toLowerCase().trim();
@@ -191,8 +192,15 @@ router.post("/auth/password-reset/request", (req, res) => {
     "INSERT INTO password_reset_challenges (student_id, email, code_hash, created_at, expires_at) VALUES (?, ?, ?, ?, ?)",
   ).run(student.id, email, resetCodeHash(email, otp), now, now + RESET_CODE_TTL_MS);
 
-  logger.info({ email, expiresInMinutes: 10 }, "password reset OTP created");
-  return genericResetResponse(res, otp);
+  try {
+    await sendPasswordResetEmail(email, otp);
+    logger.info({ email, expiresInMinutes: 10 }, "password reset OTP sent");
+    return genericResetResponse(res);
+  } catch (error) {
+    logger.error({ err: error, email }, "password reset email failed");
+    if (process.env.NODE_ENV !== "production") return genericResetResponse(res, otp);
+    return res.status(503).json({ error: "We could not send the reset email right now. Please try again shortly." });
+  }
 });
 
 router.post("/auth/password-reset/confirm", (req, res) => {

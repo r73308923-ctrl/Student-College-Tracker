@@ -1,1 +1,2 @@
 - [Student tracker backend](student-tracker-backend.md) — local scrypt auth, hashed sessions, SQLite ownership checks, and date normalization are deliberate product constraints.
+- [Integration catalog](integration-catalog.md) — connector IDs can go stale between sessions; use the live catalog before proposing a provider.
