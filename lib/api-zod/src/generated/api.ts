@@ -75,6 +75,40 @@ export const LoginResponse = zod.object({
 
 
 /**
+ * @summary Request a password reset OTP
+ */
+export const RequestPasswordResetBody = zod.object({
+  "email": zod.string().email()
+})
+
+export const RequestPasswordResetResponse = zod.object({
+  "message": zod.string(),
+  "debugOtp": zod.string().nullish()
+})
+
+
+/**
+ * @summary Confirm an OTP and set a new password
+ */
+export const confirmPasswordResetBodyOtpMin = 6;
+export const confirmPasswordResetBodyOtpMax = 6;
+
+export const confirmPasswordResetBodyNewPasswordMin = 8;
+
+
+
+export const ConfirmPasswordResetBody = zod.object({
+  "email": zod.string().email(),
+  "otp": zod.string().min(confirmPasswordResetBodyOtpMin).max(confirmPasswordResetBodyOtpMax),
+  "newPassword": zod.string().min(confirmPasswordResetBodyNewPasswordMin)
+})
+
+export const ConfirmPasswordResetResponse = zod.object({
+  "message": zod.string()
+})
+
+
+/**
  * @summary Sign out
  */
 export const LogoutResponse = zod.void()

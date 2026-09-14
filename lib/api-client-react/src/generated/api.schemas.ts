@@ -30,6 +30,31 @@ export interface LoginInput {
   password: string;
 }
 
+export interface PasswordResetRequest {
+  email: string;
+}
+
+export interface PasswordResetRequestResponse {
+  message: string;
+  /** @nullable */
+  debugOtp?: string | null;
+}
+
+export interface PasswordResetConfirm {
+  email: string;
+  /**
+     * @minLength 6
+     * @maxLength 6
+     */
+  otp: string;
+  /** @minLength 8 */
+  newPassword: string;
+}
+
+export interface MessageResponse {
+  message: string;
+}
+
 export interface Student {
   id: number;
   name: string;

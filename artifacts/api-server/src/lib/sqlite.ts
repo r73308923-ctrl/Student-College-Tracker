@@ -26,6 +26,16 @@ sqlite.exec(`
     student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
     expires_at INTEGER NOT NULL
   );
+  CREATE TABLE IF NOT EXISTS password_reset_challenges (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    email TEXT NOT NULL,
+    code_hash TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    used_at INTEGER
+  );
   CREATE TABLE IF NOT EXISTS subjects (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
@@ -71,6 +81,7 @@ sqlite.exec(`
     subject_id INTEGER REFERENCES subjects(id) ON DELETE SET NULL
   );
   CREATE INDEX IF NOT EXISTS sessions_student_idx ON sessions(student_id);
+  CREATE INDEX IF NOT EXISTS password_reset_email_idx ON password_reset_challenges(email);
   CREATE INDEX IF NOT EXISTS subjects_student_idx ON subjects(student_id);
   CREATE INDEX IF NOT EXISTS tasks_student_idx ON tasks(student_id);
   CREATE INDEX IF NOT EXISTS exams_student_idx ON exams(student_id);

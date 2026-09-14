@@ -1,6 +1,6 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import cookieParser from "cookie-parser";
-import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes, randomInt, scryptSync, timingSafeEqual } from "node:crypto";
 import {
   Analytics,
   CreateAttendanceBody,
@@ -18,6 +18,8 @@ import {
   GetTasksResponse,
   LoginBody,
   LoginResponse,
+  ConfirmPasswordResetBody,
+  RequestPasswordResetBody,
   SignupBody,
   SignupResponse,
   UpdateProfileBody,
@@ -25,10 +27,14 @@ import {
   UpdateTaskBody,
 } from "@workspace/api-zod";
 import { sqlite, type StudentRow } from "../lib/sqlite";
+import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
 const SESSION_COOKIE = "student_session";
 const SESSION_DAYS = 30;
+const RESET_CODE_TTL_MS = 10 * 60 * 1000;
+const RESET_CODE_COOLDOWN_MS = 60 * 1000;
+const RESET_CODE_MAX_ATTEMPTS = 5;
 router.use(cookieParser());
 
 type RequestWithStudent = Request & { studentId?: number };
@@ -55,6 +61,19 @@ function passwordMatches(password: string, stored: string) {
   const expected = Buffer.from(digest, "hex");
   const actual = scryptSync(password, salt, 64);
   return expected.length === actual.length && timingSafeEqual(expected, actual);
+}
+
+function resetCodeHash(email: string, code: string) {
+  return createHash("sha256")
+    .update(`${email}:${code}:${process.env.SESSION_SECRET ?? "attendex-reset"}`)
+    .digest("hex");
+}
+
+function genericResetResponse(res: Response, debugOtp?: string) {
+  res.json({
+    message: "If an Attendex Tracker account exists for that email, a 6-digit OTP has been sent.",
+    debugOtp: process.env.NODE_ENV === "production" ? null : debugOtp ?? null,
+  });
 }
 
 function createSession(studentId: number, res: Response) {
@@ -148,6 +167,59 @@ router.post("/auth/login", (req, res) => {
   if (!student || !passwordMatches(parsed.data.password, student.password_hash)) return res.status(401).json({ error: "That email and password do not match." });
   createSession(student.id, res);
   res.json(LoginResponse.parse({ student: publicStudent(student) }));
+  return;
+});
+
+router.post("/auth/password-reset/request", (req, res) => {
+  const parsed = RequestPasswordResetBody.safeParse(req.body);
+  if (!parsed.success) return genericResetResponse(res);
+  const email = parsed.data.email.toLowerCase().trim();
+  const student = sqlite.prepare("SELECT id FROM students WHERE email = ?").get(email) as { id: number } | undefined;
+  if (!student) return genericResetResponse(res);
+
+  const recent = sqlite.prepare(
+    "SELECT created_at FROM password_reset_challenges WHERE email = ? AND used_at IS NULL ORDER BY created_at DESC LIMIT 1",
+  ).get(email) as { created_at: number } | undefined;
+  if (recent && Date.now() - recent.created_at < RESET_CODE_COOLDOWN_MS) {
+    return genericResetResponse(res);
+  }
+
+  const otp = String(randomInt(100000, 1000000));
+  const now = Date.now();
+  sqlite.prepare("UPDATE password_reset_challenges SET used_at = ? WHERE email = ? AND used_at IS NULL").run(now, email);
+  sqlite.prepare(
+    "INSERT INTO password_reset_challenges (student_id, email, code_hash, created_at, expires_at) VALUES (?, ?, ?, ?, ?)",
+  ).run(student.id, email, resetCodeHash(email, otp), now, now + RESET_CODE_TTL_MS);
+
+  logger.info({ email, expiresInMinutes: 10 }, "password reset OTP created");
+  return genericResetResponse(res, otp);
+});
+
+router.post("/auth/password-reset/confirm", (req, res) => {
+  const parsed = ConfirmPasswordResetBody.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "Enter your email, 6-digit OTP, and a password of at least 8 characters." });
+  const email = parsed.data.email.toLowerCase().trim();
+  const challenge = sqlite.prepare(
+    "SELECT * FROM password_reset_challenges WHERE email = ? AND used_at IS NULL ORDER BY created_at DESC LIMIT 1",
+  ).get(email) as { id: number; student_id: number; code_hash: string; expires_at: number; attempts: number } | undefined;
+  if (!challenge || challenge.expires_at < Date.now() || challenge.attempts >= RESET_CODE_MAX_ATTEMPTS) {
+    return res.status(400).json({ error: "That OTP is expired. Request a new one and try again." });
+  }
+
+  const matches = timingSafeEqual(
+    Buffer.from(challenge.code_hash, "hex"),
+    Buffer.from(resetCodeHash(email, parsed.data.otp), "hex"),
+  );
+  if (!matches) {
+    sqlite.prepare("UPDATE password_reset_challenges SET attempts = attempts + 1 WHERE id = ?").run(challenge.id);
+    return res.status(400).json({ error: "That OTP is not correct. Check the code and try again." });
+  }
+
+  const now = Date.now();
+  sqlite.prepare("UPDATE students SET password_hash = ? WHERE id = ?").run(passwordHash(parsed.data.newPassword), challenge.student_id);
+  sqlite.prepare("UPDATE password_reset_challenges SET used_at = ? WHERE id = ?").run(now, challenge.id);
+  sqlite.prepare("DELETE FROM sessions WHERE student_id = ?").run(challenge.student_id);
+  res.json({ message: "Password changed. You can now sign in with your new password." });
   return;
 });
 
