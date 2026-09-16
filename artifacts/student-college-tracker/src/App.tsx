@@ -286,7 +286,7 @@ function ProfilePage() {
 function Info({ label, value }: { label: string; value: string }) { return <div><p className="text-xs font-bold uppercase tracking-[.12em] text-muted-foreground">{label}</p><p className="mt-2 text-sm font-semibold" data-testid={`text-profile-${label.toLowerCase()}`}>{value}</p></div>; }
 
 function ProtectedRoutes() {
-  return <Shell><Switch><Route path="/" component={DashboardPage} /><Route path="/subjects" component={SubjectsPage} /><Route path="/tasks" component={TasksPage} /><Route path="/exams" component={ExamsPage} /><Route path="/study" component={StudyPage} /><Route path="/analytics" component={AnalyticsPage} /><Route path="/profile" component={ProfilePage} /><Route component={NotFound} /></Switch></Shell>;
+  return <Shell><Switch><Route path="/" component={DashboardPage} /><Route path="/dashboard" component={DashboardPage} /><Route path="/subjects" component={SubjectsPage} /><Route path="/tasks" component={TasksPage} /><Route path="/exams" component={ExamsPage} /><Route path="/study" component={StudyPage} /><Route path="/analytics" component={AnalyticsPage} /><Route path="/profile" component={ProfilePage} /><Route component={NotFound} /></Switch></Shell>;
 }
 function Router() {
   const [location, setLocation] = useLocation();

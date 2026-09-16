@@ -1,0 +1,333 @@
+My published website is NOT working correctly:
+
+https://student-college-tracker--r73308923.replit.app
+
+The Replit Agent previously said “Attendex Tracker is fixed and running” and reported successful builds, but the actual published website is still not working.
+
+I need you to STOP giving me a completion summary and actually diagnose and FIX the problem.
+
+IMPORTANT:
+Do not assume the application works just because TypeScript checks, production builds, or API health checks pass. Test the REAL PUBLIC DEPLOYMENT from the browser and verify the complete user flow.
+
+PROJECT:
+Attendex Tracker — a college student attendance and productivity web application.
+
+PUBLIC URL:
+https://student-college-tracker--r73308923.replit.app
+
+GOAL:
+Make the public production website fully functional from start to finish.
+
+FOLLOW THESE STEPS IN ORDER:
+
+1. TEST THE PUBLIC WEBSITE
+
+* Open the exact public URL above.
+* Test it as a normal user, not only through the development preview.
+* Check:
+
+  * /
+  * /login
+  * /signup
+  * forgot password
+  * dashboard
+  * all important navigation routes
+* Check browser console errors.
+* Check network/API requests.
+* Check failed requests, 404s, 500s, CORS errors, authentication errors, database errors, and JavaScript runtime errors.
+* Check whether frontend API URLs are pointing to the correct production backend.
+
+2. CHECK DEPLOYMENT CONFIGURATION
+   Inspect the complete Replit deployment configuration.
+
+Verify:
+
+* frontend start/build command
+* backend start command
+* production PORT
+* host binding
+* environment variables
+* DATABASE_URL
+* session/authentication configuration
+* API base URL
+* frontend environment variables
+* production vs development environment differences
+* cookie configuration
+* secure cookies
+* SameSite configuration
+* CORS
+* proxy/reverse-proxy configuration
+* static file serving
+* SPA fallback routing
+* HTTPS configuration
+
+Do NOT expose any secret values in the response.
+
+3. CHECK THE BACKEND
+   Verify that the backend is actually running in production.
+
+Test every important API endpoint directly.
+
+At minimum verify:
+
+* health endpoint
+* signup
+* login
+* logout
+* current-user/session endpoint
+* forgot password
+* OTP verification
+* password reset
+* attendance APIs
+* student/profile APIs
+* dashboard APIs
+* task/productivity APIs if present
+
+Check actual HTTP status codes and response bodies.
+
+If the frontend expects one endpoint but the backend exposes another endpoint, FIX the mismatch.
+
+4. CHECK DATABASE
+   Verify the production application is connected to the correct database.
+
+Check:
+
+* database connection
+* required tables
+* schema
+* migrations
+* users
+* sessions
+* attendance data
+* OTP/reset data
+* any required indexes/constraints
+
+If migrations are missing, create/apply the required migrations safely.
+
+Do not delete existing production user data.
+
+5. CHECK AUTHENTICATION COMPLETELY
+
+Test this exact flow:
+
+SIGNUP:
+Create a test account using a clearly temporary test email if necessary.
+
+LOGIN:
+Login using the test account.
+
+SESSION:
+Refresh the browser and confirm the user remains authenticated.
+
+LOGOUT:
+Logout and confirm protected pages are inaccessible.
+
+FORGOT PASSWORD:
+Request password reset.
+
+OTP:
+Verify that the OTP flow works correctly.
+
+PASSWORD RESET:
+Set a new password.
+
+LOGIN AGAIN:
+Confirm the new password works.
+
+SESSION INVALIDATION:
+Confirm old sessions are invalidated after password reset.
+
+Fix any problem you find.
+
+6. CHECK RESEND EMAIL INTEGRATION
+
+The previous Agent claimed Resend was connected.
+
+Do not assume it works.
+
+Verify:
+
+* Resend configuration exists
+* API key is available through environment/connector configuration
+* sender address is valid
+* email sending code executes in production
+* errors from Resend are handled correctly
+* OTP is actually generated
+* OTP is stored securely/hashed
+* OTP expires correctly
+* resend cooldown works
+* maximum verification attempts work
+* OTP is single-use
+
+NEVER print or expose API keys, tokens, passwords, or secrets.
+
+If Resend cannot work because a required configuration is missing, clearly identify the exact missing configuration and fix everything else possible.
+
+7. CHECK FRONTEND ↔ BACKEND CONNECTION
+
+This is especially important.
+
+Find exactly where the frontend determines the API URL.
+
+Make sure the production frontend is calling the production API and NOT:
+
+* localhost
+* 127.0.0.1
+* a development port
+* an old Replit preview URL
+* an obsolete API URL
+
+If frontend and backend are served from the same deployment, configure the API requests correctly using the production architecture.
+
+8. CHECK ROUTING
+
+The published website must work when directly opening:
+
+/login
+/signup
+/forgot-password
+/dashboard
+
+Refreshing any valid frontend route must NOT show a Replit/Express 404.
+
+Configure SPA fallback correctly if the frontend uses React Router or another client-side router.
+
+9. CHECK COOKIES AND SESSIONS
+
+Because this is a login-based application, inspect actual browser cookies.
+
+Verify:
+
+* cookie is being set
+* cookie is sent with API requests
+* Secure setting is compatible with HTTPS
+* SameSite setting is correct
+* domain/path is correct
+* credentials are included where required
+
+Fix cross-origin authentication issues.
+
+10. CHECK ALL IMPORTANT UI FLOWS
+
+After fixing backend issues, test the application like a real student.
+
+Test:
+
+* signup
+* login
+* dashboard
+* profile
+* attendance creation
+* attendance calculation
+* attendance update/delete
+* subjects
+* tasks if implemented
+* logout
+* forgot password
+* password reset
+* navigation
+* mobile/responsive layout
+
+Fix broken buttons, forms, loading states, error states, and API failures.
+
+11. DO NOT JUST PATCH THE SYMPTOM
+
+Find the ROOT CAUSE.
+
+For example:
+If login fails, don't simply change the UI error message.
+
+Determine whether the cause is:
+
+* database
+* session
+* cookie
+* API URL
+* backend
+* CORS
+* environment variable
+* routing
+* authentication middleware
+* deployment configuration
+
+Then fix the actual cause.
+
+12. CLEAN UP DEVELOPMENT-ONLY CONFIGURATION
+
+Search the entire project for:
+
+* localhost
+* 127.0.0.1
+* hardcoded development URLs
+* development-only environment variables
+* preview URLs
+* temporary test code
+* mock APIs
+* fake authentication
+* console errors
+* TODO placeholders
+
+Replace/remove anything that prevents production functionality.
+
+13. RUN COMPLETE VERIFICATION
+
+After making fixes:
+
+* restart required workflows/services
+* run frontend typecheck
+* run backend typecheck
+* run tests
+* run production build
+* deploy/redeploy
+* open the ACTUAL PUBLIC URL
+* test it again in a fresh browser session
+* test login/signup
+* test dashboard
+* test forgot password
+* test API calls
+* check browser console
+* check server logs
+* check network requests
+
+Do not tell me “ready” unless you have actually verified the public URL.
+
+14. IF SOMETHING CANNOT BE FIXED
+
+Do NOT claim success.
+
+Tell me exactly:
+
+PROBLEM:
+[exact root cause]
+
+EVIDENCE:
+[what you observed]
+
+FIX ATTEMPTED:
+[what you changed]
+
+REMAINING REQUIREMENT:
+[exact thing I need to configure/provide]
+
+15. FINAL RESPONSE
+
+Only after completing the investigation, give me:
+
+A. ROOT CAUSE
+B. FILES CHANGED
+C. EXACT FIXES MADE
+D. DATABASE CHANGES
+E. ENVIRONMENT VARIABLES REQUIRED (names only, NEVER values)
+F. DEPLOYMENT CHANGES
+G. TESTS PERFORMED
+H. PUBLIC URL TEST RESULT
+I. ANY REMAINING ISSUE
+
+MOST IMPORTANT:
+
+Do not simply repeat the previous message saying:
+“Attendex Tracker is fixed and running.”
+
+I need you to independently reproduce the problem on the PUBLIC URL, identify the root cause, make the necessary code/configuration changes, redeploy, and then verify the PUBLIC URL again.
+
+If the public URL itself cannot be accessed from your environment, say so clearly and diagnose the project/deployment configuration using the available logs and files instead of falsely claiming that the website works.

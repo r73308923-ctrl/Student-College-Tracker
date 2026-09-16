@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "Student College Tracker"
+title = "Attendex Tracker"
 description = "A secure personal college companion for students to manage attendance, subjects, tasks, exams, study time, productivity, and daily academic priorities with isolated data per account."
 version = "1.0.0"
 id = "artifacts/student-college-tracker"
