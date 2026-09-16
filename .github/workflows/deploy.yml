@@ -34,7 +34,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --allow-build=esbuild --allow-build=better-sqlite3
+        run: pnpm install --frozen-lockfile
 
       - name: Build frontend
         run: pnpm --filter @workspace/student-college-tracker run build
